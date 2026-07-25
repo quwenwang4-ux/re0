@@ -1,0 +1,46 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Java / Maven
+target/
+*.class
+*.jar
+
+# Node / Vue
+node_modules/
+dist/
+.vite/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Environment and secrets
+.env
+.env.*
+application-local.yml
+application-local.yaml
+application-local.properties
+
+# Logs and runtime files
+logs/
+*.log
+uploads/
+runs/
+temp/
+tmp/
+
+# AI model files and datasets
+*.pt
+*.onnx
+datasets/
+
+# Archives and operating-system files
+*.zip
+*.7z
+.DS_Store
+Thumbs.db
+
