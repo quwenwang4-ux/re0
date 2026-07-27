@@ -229,6 +229,35 @@ uploads/2026/07/550e8400-e29b-41d4-a716-446655440000.jpg
 - 流程中的关键动作使用独立时间，例如 `accepted_at`、`feedback_at`、`completed_at`。
 - 识别记录通常不会被用户修改，因此重点记录开始时间、完成时间和耗时，不必为了形式加入无意义的更新时间。
 
-## 13. 后续设计
+## 13. 志愿者申请表 `volunteer_application`
 
-后续还需要设计用户与角色、资料申请、志愿者申请、工单状态日志和公开公告等表。下一步先用 SQL 创建 `fish_info`，通过实际建表学习主键、字段类型、非空约束、默认值和索引。
+志愿者申请表保存申请人提交的信息快照和管理员审核结果。客户端只能提交申请资料，申请状态由后端固定初始化为 `PENDING`，不能信任客户端传入的审核状态。
+
+| 字段 | 建议类型 | 是否为空 | 含义 |
+| --- | --- | --- | --- |
+| id | BIGINT | 否 | 主键 |
+| applicant_id | BIGINT | 否 | 申请用户编号 |
+| real_name | VARCHAR(100) | 否 | 申请时填写的真实姓名 |
+| phone | VARCHAR(30) | 否 | 申请时填写的联系电话 |
+| region | VARCHAR(100) | 否 | 所在地区 |
+| skills | VARCHAR(500) | 是 | 擅长领域 |
+| reason | TEXT | 否 | 申请理由 |
+| status | VARCHAR(20) | 否 | 申请状态 |
+| reviewer_id | BIGINT | 是 | 审核管理员编号 |
+| review_comment | VARCHAR(500) | 是 | 审核意见 |
+| reviewed_at | DATETIME | 是 | 审核时间 |
+| created_at | DATETIME | 否 | 创建时间 |
+| updated_at | DATETIME | 否 | 更新时间 |
+
+管理员审核通过时必须在同一个数据库事务中：
+
+1. 将申请状态更新为 `APPROVED`，并保存审核人、审核意见和审核时间。
+2. 在 `sys_user_role` 中为申请人增加或重新启用 `VOLUNTEER` 角色。
+
+任意一步失败时，事务需要撤销全部修改，避免出现“申请已通过但用户没有志愿者权限”等不一致状态。
+
+首版建表脚本位于 [`database/migrations/V004__create_volunteer_application.sql`](../database/migrations/V004__create_volunteer_application.sql)。
+
+## 14. 后续设计
+
+后续还需要设计鱼类资料申请、识别记录、救助工单、工单状态日志和公开公告等表。完成核心表设计后，将使用 MySQL 8 或 Docker 实际执行全部迁移脚本。
