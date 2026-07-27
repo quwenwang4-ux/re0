@@ -26,5 +26,8 @@
 6. 环境问题及动物救助工单
 7. 识别与救助数据统计
 
-详细需求请参阅 [需求说明](docs/requirements.md)。
+项目文档：
 
+- [需求说明](docs/requirements.md)
+- [系统设计](docs/system-design.md)
+- [数据库设计](docs/database-design.md)
