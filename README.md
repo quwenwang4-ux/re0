@@ -6,7 +6,7 @@
 
 ## 项目状态
 
-当前阶段：需求分析。
+当前阶段：Spring Boot 后端框架搭建。
 
 ## 计划技术栈
 
@@ -31,3 +31,4 @@
 - [需求说明](docs/requirements.md)
 - [系统设计](docs/system-design.md)
 - [数据库设计](docs/database-design.md)
+- [Spring Boot 启动学习笔记](docs/learning/01-spring-boot-bootstrap.md)
