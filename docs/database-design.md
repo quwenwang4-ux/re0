@@ -51,7 +51,25 @@ erDiagram
 
 ## 4. 用户表 `sys_user`
 
-用户表在登录权限阶段详细设计。目前其他表统一通过 `user_id`、`reporter_id`、`volunteer_id` 和 `reviewer_id` 引用它的主键 `id`。
+用户表保存账号、个人资料和账号状态。其他表统一通过 `user_id`、`reporter_id`、`volunteer_id` 和 `reviewer_id` 引用它的主键 `id`。
+
+| 字段 | 建议类型 | 是否为空 | 含义 |
+| --- | --- | --- | --- |
+| id | BIGINT | 否 | 主键 |
+| username | VARCHAR(50) | 否 | 唯一登录账号 |
+| password_hash | VARCHAR(255) | 否 | 密码散列值，禁止保存明文 |
+| nickname | VARCHAR(100) | 是 | 页面显示名称 |
+| email | VARCHAR(255) | 是 | 唯一邮箱 |
+| phone | VARCHAR(30) | 是 | 唯一手机号 |
+| avatar_url | VARCHAR(500) | 是 | 头像文件地址 |
+| status | VARCHAR(30) | 否 | ACTIVE、DISABLED 或 LOCKED |
+| created_at | DATETIME | 否 | 创建时间 |
+| updated_at | DATETIME | 否 | 更新时间 |
+| deleted | TINYINT | 否 | 逻辑删除标记 |
+
+邮箱和手机号允许为空。MySQL 唯一索引允许存在多条 `NULL`，但不允许两个用户保存相同的非空邮箱或手机号。
+
+首版建表脚本位于 [`database/migrations/V002__create_sys_user.sql`](../database/migrations/V002__create_sys_user.sql)。
 
 ## 5. 鱼类信息表 `fish_info`
 
