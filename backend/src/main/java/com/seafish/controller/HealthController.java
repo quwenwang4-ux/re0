@@ -12,4 +12,9 @@ public class HealthController {
     public String health() {
         return "SeaFish backend is running";
     }
+
+    @GetMapping("/version")
+    public String version() {
+        return "0.3.0-dev";
+    }
 }
