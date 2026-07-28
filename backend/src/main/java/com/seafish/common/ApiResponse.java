@@ -24,6 +24,17 @@ public class ApiResponse<T> {
         );
     }
 
+    public static ApiResponse<Void> failure(
+            int code,
+            String message
+    ) {
+        return new ApiResponse<>(
+                code,
+                message,
+                null
+        );
+    }
+
     public int getCode() {
         return code;
     }

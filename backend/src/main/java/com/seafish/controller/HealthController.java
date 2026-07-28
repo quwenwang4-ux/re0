@@ -25,4 +25,6 @@ public class HealthController {
     public ApiResponse<String> version() {
         return ApiResponse.success("0.3.0-dev");
     }
+
+
 }
