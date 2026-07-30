@@ -2,5 +2,8 @@ spring:
   application:
     name: seafish-backend
 
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
 server:
   port: 8081
