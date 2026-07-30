@@ -6,6 +6,7 @@ import com.seafish.service.FishInfoService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -27,5 +28,15 @@ public class FishInfoController {
                 fishInfoService.listFishes();
 
         return ApiResponse.success(fishes);
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<FishInfo> getFishById(
+            @PathVariable Long id
+    ) {
+        FishInfo fishInfo =
+                fishInfoService.getFishById(id);
+
+        return ApiResponse.success(fishInfo);
     }
 }

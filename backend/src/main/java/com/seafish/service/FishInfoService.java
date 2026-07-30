@@ -3,6 +3,7 @@ package com.seafish.service;
 import com.seafish.entity.FishInfo;
 import com.seafish.mapper.FishInfoMapper;
 import org.springframework.stereotype.Service;
+import com.seafish.exception.BusinessException;
 
 import java.util.List;
 
@@ -19,5 +20,18 @@ public class FishInfoService {
 
     public List<FishInfo> listFishes() {
         return fishInfoMapper.selectList(null);
+    }
+    public FishInfo getFishById(Long id) {
+        FishInfo fishInfo =
+                fishInfoMapper.selectById(id);
+
+        if (fishInfo == null) {
+            throw new BusinessException(
+                    40401,
+                    "鱼类信息不存在"
+            );
+        }
+
+        return fishInfo;
     }
 }
