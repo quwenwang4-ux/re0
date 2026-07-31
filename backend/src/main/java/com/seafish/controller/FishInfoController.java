@@ -7,6 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
+import com.seafish.controller.request.CreateFishRequest;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 
@@ -36,6 +42,19 @@ public class FishInfoController {
     ) {
         FishInfo fishInfo =
                 fishInfoService.getFishById(id);
+
+        return ApiResponse.success(fishInfo);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<FishInfo> createFish(
+            @Valid
+            @RequestBody
+            CreateFishRequest request
+    ) {
+        FishInfo fishInfo =
+                fishInfoService.createFish(request);
 
         return ApiResponse.success(fishInfo);
     }

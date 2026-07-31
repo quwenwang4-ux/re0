@@ -1,0 +1,28 @@
+@baseUrl = http://localhost:8081
+
+### 查询鱼类列表
+GET {{baseUrl}}/api/fishes
+Accept: application/json
+
+### 根据 ID 查询鱼类
+GET {{baseUrl}}/api/fishes/1
+Accept: application/json
+
+### 新增蓝吊
+POST {{baseUrl}}/api/fishes
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chineseName": "蓝吊",
+  "scientificName": "Paracanthurus hepatus",
+  "category": "刺尾鱼科",
+  "appearance": "身体呈鲜蓝色，具有黑色纹路和黄色尾鳍",
+  "habits": "主要以藻类为食，常在珊瑚礁附近活动",
+  "habitat": "热带珊瑚礁海域",
+  "distribution": "印度洋和太平洋热带海域",
+  "protectionLevel": "暂无特殊保护级别",
+  "coverImageUrl": null,
+  "sourceType": "OFFICIAL",
+  "sourceDescription": "项目接口测试数据"
+}

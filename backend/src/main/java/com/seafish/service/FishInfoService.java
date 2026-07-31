@@ -4,6 +4,8 @@ import com.seafish.entity.FishInfo;
 import com.seafish.mapper.FishInfoMapper;
 import org.springframework.stereotype.Service;
 import com.seafish.exception.BusinessException;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.seafish.controller.request.CreateFishRequest;
 
 import java.util.List;
 
@@ -33,5 +35,71 @@ public class FishInfoService {
         }
 
         return fishInfo;
+    }
+
+    public FishInfo createFish(
+            CreateFishRequest request
+    ) {
+        String scientificName =
+                request.getScientificName();
+
+        if (scientificName != null
+                && !scientificName.isBlank()) {
+            QueryWrapper<FishInfo> queryWrapper =
+                    new QueryWrapper<>();
+
+            queryWrapper.eq(
+                    "scientific_name",
+                    scientificName
+            );
+
+            Long existingCount =
+                    fishInfoMapper.selectCount(queryWrapper);
+
+            if (existingCount > 0) {
+                throw new BusinessException(
+                        40901,
+                        "鱼类学名已存在"
+                );
+            }
+        }
+
+        FishInfo fishInfo = new FishInfo();//request转成entity
+
+        fishInfo.setChineseName(
+                request.getChineseName()
+        );
+        fishInfo.setScientificName(scientificName);
+        fishInfo.setCategory(request.getCategory());
+        fishInfo.setAppearance(request.getAppearance());
+        fishInfo.setHabits(request.getHabits());
+        fishInfo.setHabitat(request.getHabitat());
+        fishInfo.setDistribution(
+                request.getDistribution()
+        );
+        fishInfo.setProtectionLevel(
+                request.getProtectionLevel()
+        );
+        fishInfo.setCoverImageUrl(
+                request.getCoverImageUrl()
+        );
+        fishInfo.setSourceType(
+                request.getSourceType()
+        );
+        fishInfo.setSourceDescription(
+                request.getSourceDescription()
+        );
+
+        int insertedRows =
+                fishInfoMapper.insert(fishInfo);
+
+        if (insertedRows != 1) {
+            throw new BusinessException(
+                    50001,
+                    "鱼类信息保存失败"
+            );
+        }
+
+        return getFishById(fishInfo.getId());
     }
 }
