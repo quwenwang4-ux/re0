@@ -26,3 +26,14 @@ Accept: application/json
   "sourceType": "OFFICIAL",
   "sourceDescription": "项目接口测试数据"
 }
+
+### 测试新增参数校验
+POST {{baseUrl}}/api/fishes
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chineseName": "",
+  "scientificName": "Invalid fish",
+  "sourceType": ""
+}
