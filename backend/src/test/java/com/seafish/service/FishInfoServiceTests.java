@@ -11,6 +11,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.seafish.controller.request.CreateFishRequest;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @SpringBootTest
 class FishInfoServiceTests {
@@ -55,6 +59,39 @@ class FishInfoServiceTests {
         assertEquals(
                 "鱼类信息不存在",
                 exception.getMessage()
+        );
+    }
+
+    @Test
+    @Transactional
+    void logicallyDeletesFish() {
+        CreateFishRequest request =
+                new CreateFishRequest();
+
+        request.setChineseName("逻辑删除测试鱼类");
+        request.setScientificName(
+                "DeleteTest-" + UUID.randomUUID()
+        );
+        request.setSourceType("TEST");
+
+        FishInfo createdFish =
+                fishInfoService.createFish(request);
+
+        fishInfoService.deleteFish(
+                createdFish.getId()
+        );
+
+        BusinessException exception =
+                assertThrows(
+                        BusinessException.class,
+                        () -> fishInfoService.getFishById(
+                                createdFish.getId()
+                        )
+                );
+
+        assertEquals(
+                40401,
+                exception.getCode()
         );
     }
 }

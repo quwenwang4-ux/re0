@@ -102,4 +102,18 @@ public class FishInfoService {
 
         return getFishById(fishInfo.getId());
     }
+
+    public void deleteFish(Long id) {
+        getFishById(id);
+
+        int deletedRows =
+                fishInfoMapper.deleteById(id);
+
+        if (deletedRows != 1) {
+            throw new BusinessException(
+                    50002,
+                    "鱼类信息删除失败"
+            );
+        }
+    }
 }
