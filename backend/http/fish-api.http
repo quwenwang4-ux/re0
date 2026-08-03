@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:8081
 @blueTangId = 4
-
+@clownFishId = 1
 ### 查询鱼类列表
 GET {{baseUrl}}/api/fishes
 Accept: application/json
@@ -42,3 +42,22 @@ Accept: application/json
 ### 逻辑删除蓝吊
 DELETE {{baseUrl}}/api/fishes/{{blueTangId}}
 Accept: application/json
+
+### 修改小丑鱼信息
+PUT {{baseUrl}}/api/fishes/{{clownFishId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chineseName": "小丑鱼",
+  "scientificName": "Amphiprion ocellaris",
+  "category": "雀鲷科双锯鱼属",
+  "appearance": "身体多为橙色，带有三条明显的白色条纹",
+  "habits": "常与海葵共生，并具有明显的领地意识",
+  "habitat": "热带珊瑚礁及海葵附近",
+  "distribution": "印度洋和太平洋热带海域",
+  "protectionLevel": "暂无特殊保护级别",
+  "coverImageUrl": null,
+  "sourceType": "OFFICIAL",
+  "sourceDescription": "项目修改接口第二次测试"
+}

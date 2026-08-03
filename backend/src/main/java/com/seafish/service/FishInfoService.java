@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.seafish.exception.BusinessException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.seafish.controller.request.CreateFishRequest;
+import com.seafish.controller.request.UpdateFishRequest;
 
 import java.util.List;
 
@@ -115,5 +116,86 @@ public class FishInfoService {
                     "鱼类信息删除失败"
             );
         }
+    }
+
+    public FishInfo updateFish(
+            Long id,
+            UpdateFishRequest request
+    ) {
+        // [项目自定义方法] 查询原数据并检查是否存在
+        FishInfo fishInfo =
+                getFishById(id);
+
+        String scientificName =
+                request.getScientificName();
+
+        // 学名不为空时，检查是否被其他鱼类使用
+        if (scientificName != null
+                && !scientificName.isBlank()) {
+            // [MyBatis-Plus 提供的类]
+            QueryWrapper<FishInfo> queryWrapper =
+                    new QueryWrapper<>();
+
+            queryWrapper
+                    .eq(
+                            "scientific_name",
+                            scientificName
+                    )
+                    .ne(
+                            "id",
+                            id
+                    );
+
+            // [MyBatis-Plus BaseMapper 提供]
+            Long existingCount =
+                    fishInfoMapper
+                            .selectCount(queryWrapper);
+
+            if (existingCount > 0) {
+                throw new BusinessException(
+                        40901,
+                        "鱼类学名已存在"
+                );
+            }
+        }
+
+        // 将请求中的新值设置到原来的实体对象
+        fishInfo.setChineseName(
+                request.getChineseName()
+        );
+        fishInfo.setScientificName(scientificName);
+        fishInfo.setCategory(request.getCategory());
+        fishInfo.setAppearance(request.getAppearance());
+        fishInfo.setHabits(request.getHabits());
+        fishInfo.setHabitat(request.getHabitat());
+        fishInfo.setDistribution(
+                request.getDistribution()
+        );
+        fishInfo.setProtectionLevel(
+                request.getProtectionLevel()
+        );
+        fishInfo.setCoverImageUrl(
+                request.getCoverImageUrl()
+        );
+        fishInfo.setSourceType(
+                request.getSourceType()
+        );
+        fishInfo.setSourceDescription(
+                request.getSourceDescription()
+        );
+
+        // [MyBatis-Plus BaseMapper 提供]
+        int updatedRows =
+                fishInfoMapper.updateById(fishInfo);
+
+        if (updatedRows != 1) {
+            throw new BusinessException(
+                    50003,
+                    "鱼类信息修改失败"
+            );
+        }
+
+        // [项目自定义方法] 返回数据库中的最新数据
+        return getFishById(id);
     }
 }

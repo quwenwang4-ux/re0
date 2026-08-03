@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import com.seafish.controller.request.CreateFishRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-
+import com.seafish.controller.request.UpdateFishRequest;
+import org.springframework.web.bind.annotation.PutMapping;
 import java.util.List;
 
 @RestController
@@ -60,5 +61,21 @@ public class FishInfoController {
         fishInfoService.deleteFish(id);
 
         return ApiResponse.success(null);
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<FishInfo> updateFish(
+            @PathVariable Long id,
+            @Valid
+            @RequestBody
+            UpdateFishRequest request
+    ) {
+        FishInfo fishInfo =
+                fishInfoService.updateFish(
+                        id,
+                        request
+                );
+
+        return ApiResponse.success(fishInfo);
     }
 }

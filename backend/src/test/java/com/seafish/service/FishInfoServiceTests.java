@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import com.seafish.controller.request.UpdateFishRequest;
+
 @SpringBootTest
 class FishInfoServiceTests {
 
@@ -92,6 +94,70 @@ class FishInfoServiceTests {
         assertEquals(
                 40401,
                 exception.getCode()
+        );
+    }
+
+    @Test
+    @Transactional
+    void updatesFish() {
+        CreateFishRequest createRequest =
+                new CreateFishRequest();
+
+        createRequest.setChineseName("修改前测试鱼类");
+        createRequest.setScientificName(
+                "UpdateTest-" + UUID.randomUUID()
+        );
+        createRequest.setSourceType("TEST");
+
+        FishInfo createdFish =
+                fishInfoService.createFish(
+                        createRequest
+                );
+
+        UpdateFishRequest updateRequest =
+                new UpdateFishRequest();
+
+        updateRequest.setChineseName("修改后测试鱼类");
+        updateRequest.setScientificName(
+                createdFish.getScientificName()
+        );
+        updateRequest.setSourceType("TEST");
+        updateRequest.setSourceDescription(
+                "修改接口自动测试"
+        );
+
+        FishInfo updatedFish =
+                fishInfoService.updateFish(
+                        createdFish.getId(),
+                        updateRequest
+                );
+
+        assertEquals(
+                createdFish.getId(),
+                updatedFish.getId()
+        );
+
+        assertEquals(
+                "修改后测试鱼类",
+                updatedFish.getChineseName()
+        );
+
+        assertEquals(
+                "修改接口自动测试",
+                updatedFish.getSourceDescription()
+        );
+
+        assertEquals(
+                createdFish.getCreatedAt(),
+                updatedFish.getCreatedAt()
+        );
+
+        assertFalse(
+                updatedFish
+                        .getUpdatedAt()
+                        .isBefore(
+                                createdFish.getUpdatedAt()
+                        )
         );
     }
 }
