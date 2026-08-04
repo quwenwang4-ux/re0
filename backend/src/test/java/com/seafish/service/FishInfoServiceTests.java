@@ -1,23 +1,20 @@
 package com.seafish.service;
 
+import com.seafish.common.PageResponse;
+import com.seafish.controller.request.CreateFishRequest;
+import com.seafish.controller.request.UpdateFishRequest;
 import com.seafish.entity.FishInfo;
 import com.seafish.exception.BusinessException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import com.seafish.controller.request.CreateFishRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import com.seafish.controller.request.UpdateFishRequest;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 class FishInfoServiceTests {
 
@@ -26,13 +23,21 @@ class FishInfoServiceTests {
 
     @Test
     void findsFishById() {
-        List<FishInfo> fishes =
-                fishInfoService.listFishes();
+        PageResponse<FishInfo> fishPage =
+                fishInfoService.listFishes(
+                        1,
+                        10
+                );
 
-        assertFalse(fishes.isEmpty());
+        assertFalse(
+                fishPage.getRecords().isEmpty()
+        );
 
         Long existingId =
-                fishes.get(0).getId();
+                fishPage
+                        .getRecords()
+                        .get(0)
+                        .getId();
 
         FishInfo fishInfo =
                 fishInfoService.getFishById(existingId);

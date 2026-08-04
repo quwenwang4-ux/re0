@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import com.seafish.controller.request.UpdateFishRequest;
 import org.springframework.web.bind.annotation.PutMapping;
+import com.seafish.common.PageResponse;
 import java.util.List;
 
 @RestController
@@ -24,11 +25,20 @@ public class FishInfoController {
     }
 
     @GetMapping
-    public ApiResponse<List<FishInfo>> listFishes() {
-        List<FishInfo> fishes =
-                fishInfoService.listFishes();
+    public ApiResponse<PageResponse<FishInfo>> listFishes(
+            @RequestParam(defaultValue = "1")
+            long page,
 
-        return ApiResponse.success(fishes);
+            @RequestParam(defaultValue = "10")
+            long size
+    ) {
+        PageResponse<FishInfo> pageResponse =
+                fishInfoService.listFishes(
+                        page,
+                        size
+                );
+
+        return ApiResponse.success(pageResponse);
     }
 
     @GetMapping("/{id}")

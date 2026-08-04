@@ -7,8 +7,9 @@ import com.seafish.exception.BusinessException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.seafish.controller.request.CreateFishRequest;
 import com.seafish.controller.request.UpdateFishRequest;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seafish.common.PageResponse;
 
-import java.util.List;
 
 @Service
 public class FishInfoService {
@@ -21,8 +22,40 @@ public class FishInfoService {
         this.fishInfoMapper = fishInfoMapper;
     }
 
-    public List<FishInfo> listFishes() {
-        return fishInfoMapper.selectList(null);
+    public PageResponse<FishInfo> listFishes(
+            long page,
+            long size
+    ) {
+        if (page < 1) {
+            throw new BusinessException(
+                    40005,
+                    "页码不能小于 1"
+            );
+        }
+
+        if (size < 1 || size > 100) {
+            throw new BusinessException(
+                    40006,
+                    "每页数量必须在 1 到 100 之间"
+            );
+        }
+
+        Page<FishInfo> pageRequest =
+                new Page<>(page, size);
+
+        Page<FishInfo> pageResult =
+                fishInfoMapper.selectPage(
+                        pageRequest,
+                        null
+                );
+
+        return new PageResponse<>(
+                pageResult.getRecords(),
+                pageResult.getTotal(),
+                pageResult.getCurrent(),
+                pageResult.getSize(),
+                pageResult.getPages()
+        );
     }
     public FishInfo getFishById(Long id) {
         FishInfo fishInfo =

@@ -61,3 +61,19 @@ Accept: application/json
   "sourceType": "OFFICIAL",
   "sourceDescription": "项目修改接口第二次测试"
 }
+
+### 分页查询第一页
+GET {{baseUrl}}/api/fishes?page=1&size=1
+Accept: application/json
+
+### 分页查询第二页
+GET {{baseUrl}}/api/fishes?page=2&size=1
+Accept: application/json
+
+### 测试错误页码
+GET {{baseUrl}}/api/fishes?page=0&size=10
+Accept: application/json
+
+### 测试每页数量过大
+GET {{baseUrl}}/api/fishes?page=1&size=101
+Accept: application/json
