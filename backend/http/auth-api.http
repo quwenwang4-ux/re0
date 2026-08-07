@@ -1,0 +1,38 @@
+@baseUrl = http://localhost:8081
+
+### 注册成功
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "ocean_user_001",
+  "password": "Ocean1234",
+  "nickname": "海洋爱好者",
+  "email": "ocean001@example.com",
+  "phone": "13800000001"
+}
+
+### 重复注册
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "ocean_user_001",
+  "password": "Ocean1234",
+  "nickname": "重复用户",
+  "email": "ocean001@example.com",
+  "phone": "13800000001"
+}
+
+### 注册参数不合法
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "ab",
+  "password": "123",
+  "email": "错误邮箱"
+}
