@@ -47,6 +47,18 @@ Accept: application/json
   "password": "Ocean1234"
 }
 
+> {%
+    client.global.set(
+        "accessToken",
+        response.body.data.accessToken
+    );
+%}
+
+### 查询当前登录用户
+GET {{baseUrl}}/api/users/me
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
 ### 登录密码错误
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json

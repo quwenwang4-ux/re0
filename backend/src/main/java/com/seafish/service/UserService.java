@@ -3,6 +3,7 @@ package com.seafish.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.seafish.controller.request.LoginRequest;
 import com.seafish.controller.request.RegisterRequest;
+import com.seafish.controller.response.CurrentUserResponse;
 import com.seafish.controller.response.LoginResponse;
 import com.seafish.controller.response.UserResponse;
 import com.seafish.entity.SysUser;
@@ -183,6 +184,37 @@ public class UserService {
                 accessToken,
                 "Bearer",
                 tokenService.getExpirationSeconds(),
+                toResponse(user),
+                roles
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public CurrentUserResponse getCurrentUser(
+            Long userId
+    ) {
+        SysUser user =
+                sysUserMapper.selectById(userId);
+
+        if (user == null) {
+            throw new BusinessException(
+                    40402,
+                    "用户不存在"
+            );
+        }
+
+        if (!"ACTIVE".equals(user.getStatus())) {
+            throw new BusinessException(
+                    40301,
+                    "账号已被停用"
+            );
+        }
+
+        List<String> roles =
+                sysUserRoleMapper
+                        .selectActiveRoleCodes(userId);
+
+        return new CurrentUserResponse(
                 toResponse(user),
                 roles
         );
