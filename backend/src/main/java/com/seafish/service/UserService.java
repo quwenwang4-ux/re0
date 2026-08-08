@@ -1,7 +1,9 @@
 package com.seafish.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.seafish.controller.request.LoginRequest;
 import com.seafish.controller.request.RegisterRequest;
+import com.seafish.controller.response.LoginResponse;
 import com.seafish.controller.response.UserResponse;
 import com.seafish.entity.SysUser;
 import com.seafish.exception.BusinessException;
@@ -11,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -18,15 +22,18 @@ public class UserService {
     private final SysUserMapper sysUserMapper;
     private final PasswordEncoder passwordEncoder;
     private final SysUserRoleMapper sysUserRoleMapper;
+    private final TokenService tokenService;
 
     public UserService(
             SysUserMapper sysUserMapper,
             SysUserRoleMapper sysUserRoleMapper,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            TokenService tokenService
     ) {
         this.sysUserMapper = sysUserMapper;
         this.sysUserRoleMapper = sysUserRoleMapper;
         this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
     }
 
     @Transactional
@@ -118,6 +125,67 @@ public class UserService {
                 );
 
         return toResponse(savedUser);
+    }
+
+    @Transactional(readOnly = true)
+    public LoginResponse login(
+            LoginRequest request
+    ) {
+        String username =
+                request.getUsername().trim();
+
+        QueryWrapper<SysUser> userQuery =
+                new QueryWrapper<>();
+
+        userQuery.eq("username", username);
+
+        SysUser user =
+                sysUserMapper.selectOne(userQuery);
+
+        if (user == null
+                || !passwordEncoder.matches(
+                        request.getPassword(),
+                        user.getPasswordHash()
+                )) {
+            throw new BusinessException(
+                    40101,
+                    "用户名或密码错误"
+            );
+        }
+
+        if (!"ACTIVE".equals(user.getStatus())) {
+            throw new BusinessException(
+                    40301,
+                    "账号已被停用"
+            );
+        }
+
+        List<String> roles =
+                sysUserRoleMapper
+                        .selectActiveRoleCodes(
+                                user.getId()
+                        );
+
+        if (roles.isEmpty()) {
+            throw new BusinessException(
+                    40302,
+                    "账号没有可用角色"
+            );
+        }
+
+        String accessToken =
+                tokenService.createAccessToken(
+                        user,
+                        roles
+                );
+
+        return new LoginResponse(
+                accessToken,
+                "Bearer",
+                tokenService.getExpirationSeconds(),
+                toResponse(user),
+                roles
+        );
     }
 
     private String normalizeOptional(

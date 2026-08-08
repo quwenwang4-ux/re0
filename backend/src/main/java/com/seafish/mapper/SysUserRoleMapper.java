@@ -3,6 +3,9 @@ package com.seafish.mapper;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface SysUserRoleMapper {
@@ -22,5 +25,19 @@ public interface SysUserRoleMapper {
     int assignRole(
             @Param("userId") Long userId,
             @Param("roleCode") String roleCode
+    );
+
+    @Select("""
+            SELECT r.role_code
+            FROM sys_user_role ur
+            JOIN sys_role r
+              ON r.id = ur.role_id
+            WHERE ur.user_id = #{userId}
+              AND ur.status = 'ACTIVE'
+              AND r.status = 'ACTIVE'
+            ORDER BY r.id
+            """)
+    List<String> selectActiveRoleCodes(
+            @Param("userId") Long userId
     );
 }

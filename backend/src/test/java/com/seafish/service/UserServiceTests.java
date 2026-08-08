@@ -1,6 +1,8 @@
 package com.seafish.service;
 
+import com.seafish.controller.request.LoginRequest;
 import com.seafish.controller.request.RegisterRequest;
+import com.seafish.controller.response.LoginResponse;
 import com.seafish.controller.response.UserResponse;
 import com.seafish.entity.SysUser;
 import com.seafish.mapper.SysUserMapper;
@@ -99,5 +101,43 @@ class UserServiceTests {
                 1,
                 roleCount.intValue()
         );
+    }
+
+    @Test
+    @Transactional
+    void logsInRegisteredUser() {
+        String username =
+                "login_" + UUID
+                        .randomUUID()
+                        .toString()
+                        .replace("-", "");
+
+        String password = "Ocean1234";
+
+        RegisterRequest registerRequest =
+                new RegisterRequest();
+
+        registerRequest.setUsername(username);
+        registerRequest.setPassword(password);
+        registerRequest.setNickname("登录测试用户");
+
+        userService.register(registerRequest);
+
+        LoginRequest loginRequest =
+                new LoginRequest();
+
+        loginRequest.setUsername(username);
+        loginRequest.setPassword(password);
+
+        LoginResponse response =
+                userService.login(loginRequest);
+
+        assertNotNull(response.getAccessToken());
+        assertEquals("Bearer", response.getTokenType());
+        assertEquals(
+                username,
+                response.getUser().getUsername()
+        );
+        assertTrue(response.getRoles().contains("USER"));
     }
 }

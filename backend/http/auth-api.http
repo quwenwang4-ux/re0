@@ -36,3 +36,23 @@ Accept: application/json
   "password": "123",
   "email": "错误邮箱"
 }
+
+### 登录成功
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "ocean_user_001",
+  "password": "Ocean1234"
+}
+
+### 登录密码错误
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "ocean_user_001",
+  "password": "WrongPassword"
+}

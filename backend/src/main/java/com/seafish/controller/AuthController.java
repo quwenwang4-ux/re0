@@ -1,7 +1,9 @@
 package com.seafish.controller;
 
 import com.seafish.common.ApiResponse;
+import com.seafish.controller.request.LoginRequest;
 import com.seafish.controller.request.RegisterRequest;
+import com.seafish.controller.response.LoginResponse;
 import com.seafish.controller.response.UserResponse;
 import com.seafish.service.UserService;
 import jakarta.validation.Valid;
@@ -33,6 +35,18 @@ public class AuthController {
     ) {
         UserResponse response =
                 userService.register(request);
+
+        return ApiResponse.success(response);
+    }
+
+    @PostMapping("/login")
+    public ApiResponse<LoginResponse> login(
+            @Valid
+            @RequestBody
+            LoginRequest request
+    ) {
+        LoginResponse response =
+                userService.login(request);
 
         return ApiResponse.success(response);
     }
