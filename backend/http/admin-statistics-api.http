@@ -1,0 +1,6 @@
+@baseUrl = http://localhost:8081
+
+### 管理员查看系统运营统计
+GET {{baseUrl}}/api/admin/statistics/overview
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}

@@ -1,0 +1,41 @@
+@baseUrl = http://localhost:8081
+@recordId = 1
+
+### 登录普通用户
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "ocean_user_001",
+  "password": "Ocean1234"
+}
+
+> {% client.global.set("userAccessToken", response.body.data.accessToken); %}
+
+### 上传图片识别（演示识别器根据文件名识别：clown、blue-tang、unknown）
+POST {{baseUrl}}/api/detections?modelName=demo-yolo-v1&confidenceThreshold=0.5
+Authorization: Bearer {{userAccessToken}}
+Accept: application/json
+Content-Type: multipart/form-data; boundary=SeaFishBoundary
+
+--SeaFishBoundary
+Content-Disposition: form-data; name="image"; filename="clown-fish.jpg"
+Content-Type: image/jpeg
+
+< ./samples/clown-fish.jpg
+--SeaFishBoundary--
+
+### 查询自己的识别记录
+GET {{baseUrl}}/api/detections/me?page=1&size=10
+Accept: application/json
+Authorization: Bearer {{userAccessToken}}
+
+### 查询识别记录详情
+GET {{baseUrl}}/api/detections/{{recordId}}
+Accept: application/json
+Authorization: Bearer {{userAccessToken}}
+
+### 读取自己的原始识别图片
+GET {{baseUrl}}/api/detections/{{recordId}}/image/original
+Authorization: Bearer {{userAccessToken}}

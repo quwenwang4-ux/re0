@@ -1,0 +1,80 @@
+@baseUrl = http://localhost:8081
+@approveOrderId = 1
+@rejectOrderId = 2
+@completionPendingOrderId = 3
+
+### 管理员登录（该账号必须拥有 ADMIN 角色）
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "admin_user_001",
+  "password": "Ocean1234"
+}
+
+> {%
+    client.global.set(
+        "adminAccessToken",
+        response.body.data.accessToken
+    );
+%}
+
+### 管理员查询待审核工单
+GET {{baseUrl}}/api/admin/rescue-orders?status=PENDING_REVIEW&page=1&size=10
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+### 管理员查询全部工单
+GET {{baseUrl}}/api/admin/rescue-orders?page=1&size=10
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+### 审核通过并发布工单（修改为真实待审核工单 ID）
+PUT {{baseUrl}}/api/admin/rescue-orders/{{approveOrderId}}/review
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "decision": "APPROVED",
+  "reviewComment": "信息真实，允许发布"
+}
+
+### 审核拒绝工单
+PUT {{baseUrl}}/api/admin/rescue-orders/{{rejectOrderId}}/review
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "decision": "REJECTED",
+  "reviewComment": "现场信息不完整"
+}
+
+### 非法工单状态，应返回业务错误 40012
+GET {{baseUrl}}/api/admin/rescue-orders?status=UNKNOWN&page=1&size=10
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+### 管理员确认志愿者完成反馈
+PUT {{baseUrl}}/api/admin/rescue-orders/{{completionPendingOrderId}}/completion-confirmation
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "decision": "CONFIRMED",
+  "confirmComment": "完成情况符合要求"
+}
+
+### 管理员驳回完成反馈，工单返回 ACCEPTED
+PUT {{baseUrl}}/api/admin/rescue-orders/{{completionPendingOrderId}}/completion-confirmation
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "decision": "REJECTED",
+  "confirmComment": "完成照片不清晰，请重新提交"
+}

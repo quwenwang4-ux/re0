@@ -1,0 +1,67 @@
+@baseUrl = http://localhost:8081
+@approveApplicationId = 1
+@rejectApplicationId = 2
+
+### 管理员登录（该账号必须已经拥有 ADMIN 角色）
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "admin_user_001",
+  "password": "Ocean1234"
+}
+
+> {%
+    client.global.set(
+        "adminAccessToken",
+        response.body.data.accessToken
+    );
+%}
+
+### 管理员分页查询全部志愿者申请
+GET {{baseUrl}}/api/admin/volunteer-applications?page=1&size=10
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+### 管理员查询待审核申请
+GET {{baseUrl}}/api/admin/volunteer-applications?status=PENDING&page=1&size=10
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+### 非法状态参数，应返回业务错误 40007
+GET {{baseUrl}}/api/admin/volunteer-applications?status=UNKNOWN&page=1&size=10
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+### 管理员通过志愿者申请（先把变量改成真实待审核申请 ID）
+PUT {{baseUrl}}/api/admin/volunteer-applications/{{approveApplicationId}}/review
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "status": "APPROVED",
+  "reviewComment": "申请资料符合要求"
+}
+
+### 管理员拒绝志愿者申请
+PUT {{baseUrl}}/api/admin/volunteer-applications/{{rejectApplicationId}}/review
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "status": "REJECTED",
+  "reviewComment": "申请资料不完整"
+}
+
+### 拒绝时未填写审批意见，应返回业务错误 40008
+PUT {{baseUrl}}/api/admin/volunteer-applications/{{rejectApplicationId}}/review
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "status": "REJECTED"
+}

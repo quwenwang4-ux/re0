@@ -1,32 +1,95 @@
 # 海洋鱼类智能化信息管理系统
 
-本项目面向海洋鱼类知识学习、智能识别与公益救助场景，提供鱼类信息管理、图片和视频识别、资料纠错申请、志愿者申请以及救助工单处理等功能。
+这是一个面向海洋鱼类知识学习、智能识别和公益救助场景的前后端分离项目。系统支持鱼类资料管理、用户与权限管理、图片识别、资料纠错申请、志愿者申请、救助工单流转和后台统计。
 
-项目将采用前后端分离和 AI 服务独立部署的方式进行开发，目标是完成一个可运行、可测试、可部署，并适合作为 Java 后端与 AI 应用方向求职作品的完整项目。
+当前已经完成后端 MVP（最小可用版本），下一阶段开始开发 Vue 前端。
 
-## 项目状态
+## 技术栈
 
-当前阶段：Spring Boot 后端框架搭建。
-
-## 计划技术栈
-
-- 后端：Java 17、Spring Boot 3、MyBatis-Plus
+- 后端：Java 17、Spring Boot 3、Spring Security、JWT、MyBatis-Plus
 - 数据库：MySQL 8
-- 前端：Vue 3、TypeScript、Vite、Element Plus
-- AI 服务：Python、Flask 或 FastAPI、Ultralytics YOLO
-- 工程工具：Git、Maven、npm、Docker
+- 测试：JUnit 5、Mockito、MockMvc
+- 前端（下一阶段）：Vue 3、TypeScript、Vite、Element Plus、Pinia、Axios
+- AI（后续替换）：Python、FastAPI、Ultralytics YOLO
+- 工程工具：Maven、Git、GitHub
 
-## 核心模块
+## 已完成的后端模块
 
-1. 用户与权限管理
-2. 海洋鱼类信息管理
-3. 图片与视频智能识别
-4. 鱼类资料纠错和收录申请
-5. 志愿者申请与审核
-6. 环境问题及动物救助工单
-7. 识别与救助数据统计
+1. 用户注册、登录、JWT 身份认证、个人资料修改
+2. 普通用户、志愿者、管理员三类角色与接口权限控制
+3. 管理员查询用户、启用和停用账号
+4. 鱼类资料的新增、查询、修改、逻辑删除、分页和条件搜索
+5. 志愿者申请、管理员审核和角色授予
+6. 救助工单上报、审核、公开、接单、完成反馈和管理员验收
+7. 图片文件私有存储、识别记录、识别结果和失败原因保存
+8. 未收录鱼类自动生成待处理任务，管理员确认后关联鱼类资料
+9. 用户提交鱼类新增或纠错申请，管理员审核后写入资料库
+10. 管理后台数据概览和状态统计
 
-项目文档：
+## 重要业务流程
+
+志愿者申请：
+
+`PENDING -> APPROVED / REJECTED`
+
+救助工单：
+
+`PENDING_REVIEW -> OPEN -> ACCEPTED -> COMPLETION_PENDING -> COMPLETED`
+
+资料申请：
+
+`PENDING -> APPROVED / REJECTED`
+
+## 目录说明
+
+```text
+SeaFishDetection-re/
+├─ backend/                 Spring Boot 后端
+│  ├─ src/main/java/        业务源代码
+│  ├─ src/test/java/        自动化测试
+│  └─ http/                 IDEA HTTP 接口调试文件
+├─ database/migrations/     V001-V007 数据库升级脚本
+└─ docs/                    需求、设计和学习笔记
+```
+
+## 本地运行
+
+1. 安装 Java 17、MySQL 8 和 Maven（也可使用项目 Maven Wrapper）。
+2. 创建数据库 `seafish_db`。
+3. 按编号顺序执行 `database/migrations` 中的 V001 到 V007。
+4. 在 `backend/src/main/resources/application-local.yml` 中填写本机数据库连接和 JWT 密钥。该文件已被 Git 忽略，不会上传密码。
+5. 在 `backend` 目录运行（也可以直接在 IDEA 中运行 `SeaFishApplication`）：
+
+```powershell
+mvn spring-boot:run
+```
+
+服务默认地址为 `http://localhost:8081`。
+
+## 运行测试
+
+```powershell
+cd backend
+mvn test
+```
+
+当前完整测试结果：93 个测试全部通过。
+
+## 图片识别说明
+
+目前使用 `FishDetectionClient` 接口隔离具体 AI 实现。默认的 `DemoFishDetectionClient` 用于先跑通上传、识别记录、结果入库和异常处理流程，它不是真实模型：文件名包含 `clown`、`小丑`、`blue-tang`、`bluetang` 或 `蓝吊` 时会返回演示结果。
+
+后续接入 Python YOLO 服务时，只需要新增一个 `FishDetectionClient` 实现，Controller、Service 和数据库结构不需要推倒重写。
+
+## 接口调试
+
+IDEA 可以直接运行 `backend/http` 目录中的 `.http` 文件。需要登录的接口先调用登录接口，再把返回的 token 放入请求头：
+
+```http
+Authorization: Bearer 你的token
+```
+
+## 项目文档
 
 - [需求说明](docs/requirements.md)
 - [系统设计](docs/system-design.md)

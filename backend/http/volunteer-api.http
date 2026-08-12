@@ -1,0 +1,75 @@
+@baseUrl = http://localhost:8081
+
+### 注册志愿者申请测试用户（第一次运行时执行）
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "volunteer_candidate_001",
+  "password": "Ocean1234",
+  "nickname": "志愿者候选人"
+}
+
+### 登录并保存 Token
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "volunteer_candidate_001",
+  "password": "Ocean1234"
+}
+
+> {%
+    client.global.set(
+        "accessToken",
+        response.body.data.accessToken
+    );
+%}
+
+### 提交志愿者申请
+POST {{baseUrl}}/api/volunteer-applications
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "realName": "张三",
+  "phone": "13800138000",
+  "region": "山东青岛",
+  "skills": "潜水、海洋动物救助",
+  "reason": "希望参与海洋动物保护"
+}
+
+### 查询当前用户的志愿者申请历史
+GET {{baseUrl}}/api/volunteer-applications/me
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
+### 重复提交待审核申请，应返回业务错误 40906
+POST {{baseUrl}}/api/volunteer-applications
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "realName": "张三",
+  "phone": "13800138000",
+  "region": "山东青岛",
+  "skills": "潜水、海洋动物救助",
+  "reason": "再次提交申请"
+}
+
+### 参数不合法，应返回 400
+POST {{baseUrl}}/api/volunteer-applications
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "realName": "",
+  "phone": "123",
+  "region": "",
+  "reason": ""
+}

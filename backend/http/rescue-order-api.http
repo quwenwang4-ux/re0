@@ -1,0 +1,80 @@
+@baseUrl = http://localhost:8081
+
+### 注册工单上报测试用户（第一次运行时执行）
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "rescue_reporter_001",
+  "password": "Ocean1234",
+  "nickname": "海洋问题上报人"
+}
+
+### 登录并保存 Token
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "rescue_reporter_001",
+  "password": "Ocean1234"
+}
+
+> {%
+    client.global.set(
+        "rescueAccessToken",
+        response.body.data.accessToken
+    );
+%}
+
+### 使用手动位置提交受伤动物工单
+POST {{baseUrl}}/api/rescue-orders
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{rescueAccessToken}}
+
+{
+  "issueType": "INJURED_ANIMAL",
+  "title": "海滩发现受伤海龟",
+  "description": "海龟左侧鳍部受伤，目前仍有活动迹象",
+  "locationText": "青岛市崂山区某海滩",
+  "imageUrls": [
+    "/uploads/rescue/turtle-01.jpg",
+    "/uploads/rescue/turtle-02.jpg"
+  ]
+}
+
+### 使用浏览器坐标提交环境问题工单
+POST {{baseUrl}}/api/rescue-orders
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{rescueAccessToken}}
+
+{
+  "issueType": "ENVIRONMENT",
+  "title": "海滩发现大量塑料垃圾",
+  "description": "塑料垃圾集中在礁石附近",
+  "latitude": 36.1234567,
+  "longitude": 120.1234567,
+  "imageUrls": [
+    "/uploads/rescue/environment-01.jpg"
+  ]
+}
+
+### 分页查询当前用户上报的工单
+GET {{baseUrl}}/api/rescue-orders/me?page=1&size=10
+Accept: application/json
+Authorization: Bearer {{rescueAccessToken}}
+
+### 没有提供位置，应返回业务错误 40009
+POST {{baseUrl}}/api/rescue-orders
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{rescueAccessToken}}
+
+{
+  "issueType": "OTHER",
+  "title": "其他海洋问题",
+  "description": "没有提供位置信息"
+}

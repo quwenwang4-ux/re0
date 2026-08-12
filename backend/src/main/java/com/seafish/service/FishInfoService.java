@@ -24,7 +24,9 @@ public class FishInfoService {
 
     public PageResponse<FishInfo> listFishes(
             long page,
-            long size
+            long size,
+            String keyword,
+            String category
     ) {
         if (page < 1) {
             throw new BusinessException(
@@ -43,10 +45,34 @@ public class FishInfoService {
         Page<FishInfo> pageRequest =
                 new Page<>(page, size);
 
+        QueryWrapper<FishInfo> query =
+                new QueryWrapper<>();
+
+        if (keyword != null && !keyword.isBlank()) {
+            String normalizedKeyword = keyword.trim();
+            query.and(wrapper -> wrapper
+                    .like("chinese_name", normalizedKeyword)
+                    .or()
+                    .like("scientific_name", normalizedKeyword)
+                    .or()
+                    .like("category", normalizedKeyword)
+                    .or()
+                    .like("habitat", normalizedKeyword)
+                    .or()
+                    .like("distribution", normalizedKeyword));
+        }
+
+        if (category != null && !category.isBlank()) {
+            query.eq("category", category.trim());
+        }
+
+        query.orderByAsc("chinese_name")
+                .orderByAsc("id");
+
         Page<FishInfo> pageResult =
                 fishInfoMapper.selectPage(
                         pageRequest,
-                        null
+                        query
                 );
 
         return new PageResponse<>(

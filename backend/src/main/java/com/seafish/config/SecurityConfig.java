@@ -56,7 +56,8 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/api/health",
                                 "/api/version",
-                                "/api/fishes/**"
+                                "/api/fishes/**",
+                                "/api/rescue-orders/public"
                         ).permitAll()
                         .requestMatchers(
                                 HttpMethod.POST,

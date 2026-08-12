@@ -1,0 +1,52 @@
+@baseUrl = http://localhost:8081
+@openOrderId = 1
+
+### 志愿者登录（审批成为志愿者后需要重新登录）
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "volunteer_user_001",
+  "password": "Ocean1234"
+}
+
+> {%
+    client.global.set(
+        "volunteerAccessToken",
+        response.body.data.accessToken
+    );
+%}
+
+### 查看当前可接取的公开工单，不需要 Token
+GET {{baseUrl}}/api/rescue-orders/public?page=1&size=10
+Accept: application/json
+
+### 志愿者查询自己接取的工单
+GET {{baseUrl}}/api/volunteer/rescue-orders/me?page=1&size=10
+Accept: application/json
+Authorization: Bearer {{volunteerAccessToken}}
+
+### 志愿者接单（将 openOrderId 修改为真实的 OPEN 工单 ID）
+PUT {{baseUrl}}/api/volunteer/rescue-orders/{{openOrderId}}/accept
+Accept: application/json
+Authorization: Bearer {{volunteerAccessToken}}
+
+### 重复接取同一工单，应返回业务错误 40909
+PUT {{baseUrl}}/api/volunteer/rescue-orders/{{openOrderId}}/accept
+Accept: application/json
+Authorization: Bearer {{volunteerAccessToken}}
+
+### 志愿者提交完成反馈（必须是本人已经接取的工单）
+PUT {{baseUrl}}/api/volunteer/rescue-orders/{{openOrderId}}/completion
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{volunteerAccessToken}}
+
+{
+  "completionDescription": "已经完成环境清理和现场检查",
+  "imageUrls": [
+    "https://example.com/completion-1.jpg",
+    "https://example.com/completion-2.jpg"
+  ]
+}

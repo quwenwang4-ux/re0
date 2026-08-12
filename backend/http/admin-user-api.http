@@ -1,0 +1,17 @@
+@baseUrl = http://localhost:8081
+@targetUserId = 2
+
+### 管理员分页查询用户
+GET {{baseUrl}}/api/admin/users?page=1&size=10&keyword=ocean&status=ACTIVE
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+### 管理员停用用户
+PUT {{baseUrl}}/api/admin/users/{{targetUserId}}/status
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "status": "DISABLED"
+}

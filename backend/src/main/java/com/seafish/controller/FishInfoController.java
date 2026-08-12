@@ -30,12 +30,20 @@ public class FishInfoController {
             long page,
 
             @RequestParam(defaultValue = "10")
-            long size
+            long size,
+
+            @RequestParam(required = false)
+            String keyword,
+
+            @RequestParam(required = false)
+            String category
     ) {
         PageResponse<FishInfo> pageResponse =
                 fishInfoService.listFishes(
                         page,
-                        size
+                        size,
+                        keyword,
+                        category
                 );
 
         return ApiResponse.success(pageResponse);

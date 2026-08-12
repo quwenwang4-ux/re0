@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:8081
+
+### 游客查询已发布的救助工单，不需要 Token
+GET {{baseUrl}}/api/rescue-orders/public?page=1&size=10
+Accept: application/json
+
+### 页码不合法，应返回业务错误 40005
+GET {{baseUrl}}/api/rescue-orders/public?page=0&size=10
+Accept: application/json
+
+### 每页数量不合法，应返回业务错误 40006
+GET {{baseUrl}}/api/rescue-orders/public?page=1&size=101
+Accept: application/json

@@ -59,6 +59,29 @@ GET {{baseUrl}}/api/users/me
 Accept: application/json
 Authorization: Bearer {{accessToken}}
 
+### 修改当前登录用户的个人资料
+PUT {{baseUrl}}/api/users/me
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "nickname": "海洋守护志愿者",
+  "email": "ocean001@example.com",
+  "phone": "13800000001",
+  "avatarUrl": "/uploads/avatars/ocean-user-001.jpg"
+}
+
+### 修改个人资料时手机号格式错误
+PUT {{baseUrl}}/api/users/me
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "phone": "123"
+}
+
 ### 登录密码错误
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json

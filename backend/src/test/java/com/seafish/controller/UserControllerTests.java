@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,5 +83,137 @@ class UserControllerTests {
                         jsonPath("$.data.roles[0]")
                                 .value("USER")
                 );
+    }
+
+    @Test
+    void requiresAuthenticationToUpdateMe()
+            throws Exception {
+        mockMvc.perform(
+                        put("/api/users/me")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "nickname": "未登录用户"
+                                        }
+                                        """)
+                )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @Transactional
+    void updatesCurrentUserForValidToken()
+            throws Exception {
+        String uniqueValue = UUID
+                .randomUUID()
+                .toString()
+                .replace("-", "");
+
+        RegisterRequest registerRequest =
+                new RegisterRequest();
+
+        registerRequest.setUsername(
+                "update_" + uniqueValue
+        );
+        registerRequest.setPassword("Ocean1234");
+        registerRequest.setNickname("修改前昵称");
+
+        UserResponse registeredUser =
+                userService.register(registerRequest);
+
+        String email =
+                "profile_" + uniqueValue
+                        + "@example.com";
+
+        mockMvc.perform(
+                        put("/api/users/me")
+                                .with(jwt()
+                                        .jwt(token -> token
+                                                .subject(
+                                                        registeredUser
+                                                                .getId()
+                                                                .toString()
+                                                )
+                                        )
+                                        .authorities(
+                                                new SimpleGrantedAuthority(
+                                                        "ROLE_USER"
+                                                )
+                                        )
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "nickname": "修改后昵称",
+                                          "email": "%s",
+                                          "phone": "13800000002",
+                                          "avatarUrl": "/uploads/avatar/test.jpg"
+                                        }
+                                        """.formatted(email))
+                )
+                .andExpect(status().isOk())
+                .andExpect(
+                        jsonPath("$.data.nickname")
+                                .value("修改后昵称")
+                )
+                .andExpect(
+                        jsonPath("$.data.email")
+                                .value(email)
+                )
+                .andExpect(
+                        jsonPath("$.data.phone")
+                                .value("13800000002")
+                )
+                .andExpect(
+                        jsonPath("$.data.avatarUrl")
+                                .value(
+                                        "/uploads/avatar/test.jpg"
+                                )
+                );
+    }
+
+    @Test
+    @Transactional
+    void rejectsInvalidPhoneWhenUpdatingMe()
+            throws Exception {
+        String username =
+                "invalid_phone_" + UUID
+                        .randomUUID()
+                        .toString()
+                        .replace("-", "");
+
+        RegisterRequest registerRequest =
+                new RegisterRequest();
+
+        registerRequest.setUsername(username);
+        registerRequest.setPassword("Ocean1234");
+
+        UserResponse registeredUser =
+                userService.register(registerRequest);
+
+        mockMvc.perform(
+                        put("/api/users/me")
+                                .with(jwt()
+                                        .jwt(token -> token
+                                                .subject(
+                                                        registeredUser
+                                                                .getId()
+                                                                .toString()
+                                                )
+                                        )
+                                        .authorities(
+                                                new SimpleGrantedAuthority(
+                                                        "ROLE_USER"
+                                                )
+                                        )
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "phone": "123"
+                                        }
+                                        """)
+                )
+                .andExpect(status().isBadRequest());
     }
 }

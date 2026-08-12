@@ -1,0 +1,40 @@
+@baseUrl = http://localhost:8081
+@applicationId = 1
+
+### 用户提交新增鱼类申请
+POST {{baseUrl}}/api/fish-applications
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{userAccessToken}}
+
+{
+  "applicationType": "ADD",
+  "chineseName": "测试海洋鱼类",
+  "scientificName": "Testus marinus",
+  "category": "硬骨鱼纲",
+  "habitat": "珊瑚礁海域",
+  "distribution": "西太平洋",
+  "sourceDescription": "海洋生物资料库",
+  "reason": "系统暂未收录该鱼类"
+}
+
+### 用户查看自己的申请
+GET {{baseUrl}}/api/fish-applications/me?page=1&size=10
+Accept: application/json
+Authorization: Bearer {{userAccessToken}}
+
+### 管理员查看待审核申请
+GET {{baseUrl}}/api/admin/fish-applications?status=PENDING&page=1&size=10
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+### 管理员通过申请，自动写入正式鱼类资料
+PUT {{baseUrl}}/api/admin/fish-applications/{{applicationId}}/review
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "decision": "APPROVED",
+  "reviewComment": "资料来源可靠，同意收录"
+}

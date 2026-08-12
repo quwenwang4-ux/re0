@@ -2,7 +2,7 @@
 @blueTangId = 4
 @clownFishId = 1
 ### 查询鱼类列表
-GET {{baseUrl}}/api/fishes
+GET {{baseUrl}}/api/fishes?page=1&size=10&keyword=小丑鱼
 Accept: application/json
 
 ### 根据 ID 查询鱼类

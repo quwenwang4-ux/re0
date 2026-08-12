@@ -1,0 +1,20 @@
+@baseUrl = http://localhost:8081
+@taskId = 1
+@fishId = 1
+
+### 查看识别产生的待补全鱼类资料任务
+GET {{baseUrl}}/api/admin/fish-profile-tasks?status=PENDING&page=1&size=10
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+### 将未收录识别类别关联到已有鱼类资料
+PUT {{baseUrl}}/api/admin/fish-profile-tasks/{{taskId}}/review
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "decision": "RESOLVED",
+  "fishId": {{fishId}},
+  "reviewComment": "已确认该类别对应现有鱼类资料"
+}

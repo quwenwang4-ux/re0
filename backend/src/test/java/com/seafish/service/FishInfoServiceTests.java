@@ -22,11 +22,35 @@ class FishInfoServiceTests {
     private FishInfoService fishInfoService;
 
     @Test
+    @Transactional
+    void searchesFishesByKeyword() {
+        CreateFishRequest request = new CreateFishRequest();
+        String uniqueName = "搜索测试鱼" + UUID.randomUUID();
+        request.setChineseName(uniqueName);
+        request.setScientificName("SearchTest-" + UUID.randomUUID());
+        request.setSourceType("TEST");
+        fishInfoService.createFish(request);
+
+        PageResponse<FishInfo> result =
+                fishInfoService.listFishes(
+                        1,
+                        10,
+                        uniqueName,
+                        null
+                );
+
+        assertEquals(1, result.getTotal());
+        assertEquals(uniqueName, result.getRecords().get(0).getChineseName());
+    }
+
+    @Test
     void findsFishById() {
         PageResponse<FishInfo> fishPage =
                 fishInfoService.listFishes(
                         1,
-                        10
+                        10,
+                        null,
+                        null
                 );
 
         assertFalse(
