@@ -7,6 +7,7 @@ export interface DetectionResult {
 export interface DetectionRecord {
   id: number; originalFileName: string; modelName: string; confidenceThreshold: number
   status: string; errorCode: string | null; errorMessage: string | null
+  originalImageUrl: string; resultImageUrl: string | null
   durationMs: number | null; createdAt: string; results: DetectionResult[]
 }
 export interface RescueOrder {

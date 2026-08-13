@@ -1,0 +1,1 @@
+"""SeaFish YOLO inference service."""

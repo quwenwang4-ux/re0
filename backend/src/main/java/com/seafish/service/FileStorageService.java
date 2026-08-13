@@ -81,6 +81,53 @@ public class FileStorageService {
         );
     }
 
+    public String saveDetectionResultImage(byte[] content) {
+        if (content == null || content.length == 0) {
+            throw new BusinessException(50020, "识别结果图片为空");
+        }
+        String storedName = UUID.randomUUID() + "-result.jpg";
+        Path directory = storageRoot.resolve("detection").normalize();
+        Path target = directory.resolve(storedName).normalize();
+        if (!target.startsWith(directory)) {
+            throw new BusinessException(50020, "识别结果文件名不合法");
+        }
+        try {
+            Files.createDirectories(directory);
+            Files.write(target, content);
+        } catch (IOException exception) {
+            throw new BusinessException(50020, "识别结果图片保存失败");
+        }
+        return "detection/" + storedName;
+    }
+
+    public String savePublicRescueImage(MultipartFile file) {
+        validateImage(file);
+        String storedName = UUID.randomUUID()
+                + extensionOf(file.getOriginalFilename());
+        Path directory = storageRoot.resolve("public/rescue").normalize();
+        Path target = directory.resolve(storedName).normalize();
+        if (!target.startsWith(directory)) {
+            throw new BusinessException(40020, "文件名不合法");
+        }
+        try {
+            Files.createDirectories(directory);
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException exception) {
+            throw new BusinessException(50020, "救助图片保存失败");
+        }
+        return storedName;
+    }
+
+    public Resource loadPublicRescueImage(String fileName) {
+        if (fileName == null
+                || !fileName.matches("^[a-f0-9-]{36}\\.(jpg|jpeg|png|webp)$")) {
+            throw new BusinessException(40420, "图片文件不存在");
+        }
+        return loadPrivateFile("public/rescue/" + fileName);
+    }
+
     public Resource loadPrivateFile(String storageKey) {
         Path target = resolveStorageKey(storageKey);
         try {

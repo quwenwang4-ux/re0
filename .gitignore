@@ -37,6 +37,7 @@ tmp/
 *.pt
 *.onnx
 datasets/
+!ai-service/models/best.pt
 
 # Archives and operating-system files
 *.zip

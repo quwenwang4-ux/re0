@@ -60,6 +60,10 @@ public class SecurityConfig {
                                 "/api/rescue-orders/public"
                         ).permitAll()
                         .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/files/rescue-images/**"
+                        ).permitAll()
+                        .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/fishes/**"
                         ).hasRole("ADMIN")

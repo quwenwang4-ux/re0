@@ -18,3 +18,6 @@ seafish:
     root: ${SEAFISH_STORAGE_ROOT:./uploads}
   detection:
     provider: ${SEAFISH_DETECTION_PROVIDER:demo}
+    default-model: ${SEAFISH_DETECTION_DEFAULT_MODEL:demo-yolo-v1}
+    service-url: ${SEAFISH_DETECTION_SERVICE_URL:http://localhost:8000}
+    timeout-seconds: ${SEAFISH_DETECTION_TIMEOUT_SECONDS:60}

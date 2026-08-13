@@ -40,6 +40,7 @@ public class DetectionService {
     private final SysUserMapper sysUserMapper;
     private final FileStorageService fileStorageService;
     private final FishDetectionClient detectionClient;
+    private final String defaultModelName;
 
     public DetectionService(
             DetectionRecordMapper recordMapper,
@@ -48,7 +49,10 @@ public class DetectionService {
             FishProfileTaskMapper fishProfileTaskMapper,
             SysUserMapper sysUserMapper,
             FileStorageService fileStorageService,
-            FishDetectionClient detectionClient
+            FishDetectionClient detectionClient,
+            @org.springframework.beans.factory.annotation.Value(
+                    "${seafish.detection.default-model:demo-yolo-v1}"
+            ) String defaultModelName
     ) {
         this.recordMapper = recordMapper;
         this.resultMapper = resultMapper;
@@ -57,6 +61,7 @@ public class DetectionService {
         this.sysUserMapper = sysUserMapper;
         this.fileStorageService = fileStorageService;
         this.detectionClient = detectionClient;
+        this.defaultModelName = defaultModelName;
     }
 
     @Transactional
@@ -337,7 +342,7 @@ public class DetectionService {
 
     private String normalizeModel(String modelName) {
         if (modelName == null || modelName.isBlank()) {
-            return "demo-yolo-v1";
+            return defaultModelName;
         }
         String normalized = modelName.trim();
         if (normalized.length() > 100) {

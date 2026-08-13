@@ -11,3 +11,7 @@ export const listMyVolunteerApplicationsApi = () => http.get<ApiResponse<Volunte
 export const listVolunteerOrdersApi = (page = 1, size = 10) => http.get<ApiResponse<PageResponse<RescueOrder>>>('/volunteer/rescue-orders/me', { params: { page, size } })
 export const acceptRescueApi = (id: number) => http.put<ApiResponse<RescueOrder>>(`/volunteer/rescue-orders/${id}/accept`)
 export const completeRescueApi = (id: number, completionDescription: string, imageUrls: string[] = []) => http.put<ApiResponse<RescueOrder>>(`/volunteer/rescue-orders/${id}/completion`, { completionDescription, imageUrls })
+export async function uploadRescueImageApi(image: File) {
+  const form = new FormData(); form.append('image', image)
+  return http.post<ApiResponse<{ fileName:string; url:string }>>('/files/rescue-images', form, { headers:{ 'Content-Type':'multipart/form-data' } })
+}

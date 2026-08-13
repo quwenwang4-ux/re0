@@ -1,0 +1,59 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: seafish_db
+      MYSQL_USER: seafish
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  ai-service:
+    build: ./ai-service
+    environment:
+      SEAFISH_MODEL_PATH: /app/models/best.pt
+    ports:
+      - "8000:8000"
+
+  backend:
+    build: ./backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/seafish_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: seafish
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      APP_JWT_SECRET: ${JWT_SECRET}
+      APP_JWT_EXPIRATION_SECONDS: 7200
+      SEAFISH_DETECTION_PROVIDER: yolo-service
+      SEAFISH_DETECTION_DEFAULT_MODEL: best
+      SEAFISH_DETECTION_SERVICE_URL: http://ai-service:8000
+      SEAFISH_STORAGE_ROOT: /app/uploads
+    volumes:
+      - upload-data:/app/uploads
+    ports:
+      - "8081:8081"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  mysql-data:
+  upload-data:
