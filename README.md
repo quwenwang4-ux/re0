@@ -2,7 +2,7 @@
 
 这是一个面向海洋鱼类知识学习、智能识别和公益救助场景的前后端分离项目。系统支持鱼类资料管理、用户与权限管理、图片识别、资料纠错申请、志愿者申请、救助工单流转和后台统计。
 
-当前已经完成后端 MVP（最小可用版本），下一阶段开始开发 Vue 前端。
+当前已经完成后端 MVP（最小可用版本），并进入 Vue 前端开发阶段。
 
 ## 技术栈
 
@@ -48,6 +48,7 @@ SeaFishDetection-re/
 │  ├─ src/main/java/        业务源代码
 │  ├─ src/test/java/        自动化测试
 │  └─ http/                 IDEA HTTP 接口调试文件
+├─ frontend/                Vue 3 + TypeScript 前端
 ├─ database/migrations/     V001-V007 数据库升级脚本
 └─ docs/                    需求、设计和学习笔记
 ```
