@@ -2,15 +2,15 @@
 
 这是一个面向海洋鱼类知识学习、智能识别和公益救助场景的前后端分离项目。系统支持鱼类资料管理、用户与权限管理、图片识别、资料纠错申请、志愿者申请、救助工单流转和后台统计。
 
-当前已经完成前后端 MVP（最小可用版本）。前端已经覆盖公共浏览、用户业务、志愿者业务和管理员业务，下一阶段进入前后端联合调试与真实 AI 模型接入。
+当前已经完成可运行的全栈 MVP（最小可用版本），覆盖前端、后端、数据库、真实 AI 识别服务、自动化测试和容器化部署。
 
 ## 技术栈
 
 - 后端：Java 17、Spring Boot 3、Spring Security、JWT、MyBatis-Plus
 - 数据库：MySQL 8
 - 测试：JUnit 5、Mockito、MockMvc
-- 前端（下一阶段）：Vue 3、TypeScript、Vite、Element Plus、Pinia、Axios
-- AI（后续替换）：Python、FastAPI、Ultralytics YOLO
+- 前端：Vue 3、TypeScript、Vite、Element Plus、Pinia、Axios
+- AI：Python、FastAPI、Ultralytics YOLO（已接入训练好的 `best.pt`）
 - 工程工具：Maven、Git、GitHub
 
 ## 已完成的后端模块
@@ -61,6 +61,7 @@ SeaFishDetection-re/
 │  ├─ src/test/java/        自动化测试
 │  └─ http/                 IDEA HTTP 接口调试文件
 ├─ frontend/                Vue 3 + TypeScript 前端
+├─ ai-service/              FastAPI + YOLO 真实识别服务和模型
 ├─ database/migrations/     V001-V007 数据库升级脚本
 └─ docs/                    需求、设计和学习笔记
 ```
@@ -86,13 +87,28 @@ cd backend
 mvn test
 ```
 
-当前完整测试结果：93 个测试全部通过。
+当前完整测试结果：97 个测试全部通过。
 
 ## 图片识别说明
 
-目前使用 `FishDetectionClient` 接口隔离具体 AI 实现。默认的 `DemoFishDetectionClient` 用于先跑通上传、识别记录、结果入库和异常处理流程，它不是真实模型：文件名包含 `clown`、`小丑`、`blue-tang`、`bluetang` 或 `蓝吊` 时会返回演示结果。
+项目使用 `FishDetectionClient` 接口隔离具体 AI 实现。开发环境默认使用 `DemoFishDetectionClient`，无需安装 Python 也能调试业务；将 `SEAFISH_DETECTION_PROVIDER` 设置为 `yolo-service` 后，Spring Boot 会调用独立 FastAPI 服务和真实 `best.pt` 模型，并保存带检测框的结果图。
 
-后续接入 Python YOLO 服务时，只需要新增一个 `FishDetectionClient` 实现，Controller、Service 和数据库结构不需要推倒重写。
+AI 服务代码位于 `ai-service`，接口文档地址为 `http://localhost:8000/docs`。
+
+## 一键验证和启动
+
+```powershell
+.\scripts\verify.ps1
+.\scripts\start-dev.ps1
+```
+
+启用真实 AI：
+
+```powershell
+.\scripts\start-dev.ps1 -UseRealAi
+```
+
+也可以复制 `.env.example` 为 `.env`，填写密码与 JWT 密钥后运行 `docker compose up --build`，一次启动 MySQL、AI、后端和前端。
 
 ## 接口调试
 
@@ -108,3 +124,4 @@ Authorization: Bearer 你的token
 - [系统设计](docs/system-design.md)
 - [数据库设计](docs/database-design.md)
 - [Spring Boot 启动学习笔记](docs/learning/01-spring-boot-bootstrap.md)
+- [项目演示与答辩流程](docs/demo-guide.md)
